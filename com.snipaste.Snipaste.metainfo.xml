@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.snipaste.Snipaste</id>
+  <update_contact>snipaste.app@gmail.com</update_contact>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>Snipaste</name>
+  <summary>A screenshot tool</summary>
+  <description>
+    <p>
+      Snip &amp; Paste!
+    </p>
+  </description>
+  <url type="homepage">https://zh.snipaste.com/</url>
+  <developer id="xxx.xxx">
+    <name>xxx</name>
+  </developer>
+  <releases>
+    <release version="2.10.8" date="2025-06-03"/>
+  </releases>
+  <launchable type="desktop-id">com.snipaste.Snipaste.desktop</launchable>
+  <content_rating type="oars-1.1">
+  </content_rating>
+  <project_license>LicenseRef-proprietary=https://zh.snipaste.com/eula.html</project_license>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://i.v2ex.co/N3QEb3VA.png</image>
+      <caption>Snipaste</caption>
+    </screenshot>
+  </screenshots>
+</component>

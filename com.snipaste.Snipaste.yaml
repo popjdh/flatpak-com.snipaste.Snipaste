@@ -1,0 +1,71 @@
+app-id: com.snipaste.Snipaste
+runtime: org.kde.Platform
+runtime-version: '5.15-24.08'
+sdk: org.kde.Sdk
+command: snipaste
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=x11
+  - --socket=pulseaudio
+  - --device=dri
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --filesystem=xdg-pictures
+  - --persist=.snipaste
+separate-locales: false
+
+modules:
+  # 直接使用 *.AppImage --appimage-extract 出现 `/proc/self/exe` 相关错误
+  - name: unappimage
+    buildsystem: simple
+    build-commands:
+      - make -C squashfs-tools install INSTALL_DIR=/app/bin
+    sources:
+      - type: git
+        url: https://github.com/refi64/unappimage
+        commit: d7f86f2a0d7ec3a69211125207d5f127386b849a
+  - name: snipaste
+    buildsystem: simple
+    build-commands:
+      - install -D -m 755 -t /app/bin/ apply_extra snipaste wlhelper
+      - install -D -t /app/share/icons/hicolor/256x256/apps/ com.snipaste.Snipaste.png
+      - install -D -t /app/share/applications/ com.snipaste.Snipaste.desktop
+      - install -D -t /app/share/metainfo/ com.snipaste.Snipaste.metainfo.xml
+    sources:
+      - type: script
+        commands:
+          - exec /app/extra/bin/snipaste "$@"
+        dest-filename: snipaste
+      - type: script
+        commands:
+          - exec /app/extra/bin/wlhelper "$@"
+        dest-filename: wlhelper
+      - type: script
+        commands:
+          - chmod +x snipaste.appimage
+          - unappimage snipaste.appimage
+          - mkdir -p /app/extra/snipaste/
+          - mv squashfs-root/usr/* /app/extra/snipaste/
+          - chmod 755 /app/extra/snipaste/bin/Snipaste
+          - chmod 755 /app/extra/snipaste/bin/wlhelper
+          - mkdir -p /app/extra/bin/
+          - ln -s /app/extra/snipaste/bin/Snipaste /app/extra/bin/snipaste
+          - ln -s /app/extra/snipaste/bin/wlhelper /app/extra/bin/wlhelper
+          - cp -r /app/extra/snipaste/share/icons/hicolor/* /app/extra/export/share/icons/hicolor/
+          - find /app/extra/export/share/icons/hicolor/ -type f -name '*.png' -exec bash -c 'mv "$0" "${0%/*}/com.snipaste.Snipaste.png"' {}
+          - rm -rf squashfs-root && rm snipaste.appimage
+        dest-filename: apply_extra
+      - type: extra-data
+        url: https://download.snipaste.com/archives/Snipaste-2.10.8-x86_64.AppImage
+        size: 29340864
+        sha256: 21e8adc5cd473e3a81a5feffad110a71af94d2cac4faafecf26cfef5585cce4d
+        filename: snipaste.appimage
+        x-checker-data:
+          type: electron-updater
+      - type: file
+        path: com.snipaste.Snipaste.metainfo.xml
+      - type: file
+        path: com.snipaste.Snipaste.desktop
+      - type: file
+        path: com.snipaste.Snipaste.png

@@ -1,0 +1,47 @@
+name: Build and Deploy Flatpak
+
+on:
+  workflow_dispatch:
+
+jobs:
+  flatpak:
+    name: Flatpak
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/andyholmes/flatter/freedesktop:24.08
+      options: --privileged
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup GPG
+        id: gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Build
+        uses: andyholmes/flatter@main
+        with:
+          files: |
+            com.snipaste.Snipaste.yaml
+          flatpak-builder-args: |
+            --install-deps-from=flathub
+          gpg-sign: ${{ steps.gpg.outputs.fingerprint }}
+          upload-bundles: true
+          upload-pages-artifact: true
+          upload-pages-includes: |
+            Snipaste.flatpakref
+  deploy:
+    name: Deploy
+    needs: flatpak
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
