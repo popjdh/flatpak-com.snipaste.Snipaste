@@ -1,6 +1,6 @@
 app-id: com.snipaste.Snipaste
 runtime: org.kde.Platform
-runtime-version: '5.15-24.08'
+runtime-version: '6.9'
 sdk: org.kde.Sdk
 command: snipaste
 finish-args:
@@ -16,6 +16,14 @@ finish-args:
 separate-locales: false
 
 modules:
+  - name: i-am-watching
+    buildsystem: cmake
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/app
+    sources:
+      - type: dir
+        path: i-am-watching
   # 直接使用 *.AppImage --appimage-extract 出现 `/proc/self/exe` 相关错误
   - name: unappimage
     buildsystem: simple
@@ -35,7 +43,17 @@ modules:
     sources:
       - type: script
         commands:
-          - exec /app/extra/bin/snipaste "$@"
+          - |
+            #!/bin/bash
+            trap cleanup EXIT
+            cleanup() {
+                if [ -n "$WATCHER_PID" ]; then
+                    kill -TERM -- -$WATCHER_PID 2>/dev/null
+                fi
+            }
+            setsid /app/bin/i-am-watching > ~/.snipaste/i-am-watching.log 2>&1 &
+            WATCHER_PID=$!
+            exec /app/extra/bin/snipaste "$@"
         dest-filename: snipaste
       - type: script
         commands:
