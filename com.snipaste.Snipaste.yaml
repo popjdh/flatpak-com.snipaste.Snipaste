@@ -75,9 +75,9 @@ modules:
           - rm -rf squashfs-root && rm snipaste.appimage
         dest-filename: apply_extra
       - type: extra-data
-        url: https://download.snipaste.com/archives/Snipaste-2.10.8-x86_64.AppImage
-        size: 29340864
-        sha256: 21e8adc5cd473e3a81a5feffad110a71af94d2cac4faafecf26cfef5585cce4d
+        url: https://download.snipaste.com/archives/Snipaste-2.11.2-x86_64.AppImage
+        size: 37348544
+        sha256: 01a8ca993974c1ab6c99d029b7929834a77532acb9cf1cc8ec0f9dea90d7765b
         filename: snipaste.appimage
         x-checker-data:
           type: electron-updater
